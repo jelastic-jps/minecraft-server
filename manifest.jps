@@ -51,6 +51,7 @@
             "commands": [
               "echo \"eula=true\" > /data/eula.txt",
               "sed  -i \"/usermod\\|groupmod/d\" /start",
+              "apk add screen",
               "wget https://github.com/jelastic-jps/minecraft-server/raw/master/properties/server.properties -O /data/server.properties",
               "wget https://github.com/jelastic-jps/minecraft-server/raw/master/lib/jelastic-gc-agent.jar -O /data/jelastic-gc-agent.jar",
               "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/memoryConfig.sh -O /data/memoryConfig.sh",
