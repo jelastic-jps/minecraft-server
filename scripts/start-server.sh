@@ -11,4 +11,8 @@ GC_DEBUG=${GC_DEBUG:-0}
 
 JVM_OPTS=$JAVA_OPTS
 
+apk add screen
+
+pushd /data/web; screen -md python -m SimpleHTTPServer 8080 ; popd;
+
 source /start
