@@ -16,6 +16,6 @@ apk add screen
 VANILLA_VERSION=$(ls /data/minecraft_server* |  awk -F "." '{ print $2"."$3"."$4 }');
 
 [ ! -z $VANILLA_VERSION ] && sed -i "s/VANILLA_VERSION/$VANILLA_VERSION/g" /data/web/index.html
-pushd /data/web; screen -md python -m SimpleHTTPServer 8080 ; popd;
+pushd /data/web; screen -md "sleep 20 && python -m SimpleHTTPServer 8080" ; popd;
 
 source /start
