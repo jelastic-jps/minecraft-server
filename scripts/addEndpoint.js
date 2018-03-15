@@ -17,22 +17,11 @@ var scripting =  hivext.local.exp.wrapRequest(new Scripting({
     serverUrl : "http://" + window.location.host.replace("app", "appstore") + "/"
 }));
 
-var text = "Your Minecraft server has been successfully deployed. </br> Please use the following server address to connect your Minecraft client: <a href='tcp://" + url + "'>" + url + "</a>.";
-resp = scripting.eval({
-    script : "InstallApp",
-    targetAppid : '${env.appid}',
-    session: session, 
-    manifest : {
-        "jpsType" : "update",
-        "application" : {
-		"id": "sendEmail",
-		"name": "Minecraft Server",
-		"success": {
-		        "text": text,
-		        "email": text
-		}
-	}
+return {
+    result: 0,
+    onAfterReturn : {
+        sendEmail : {
+            url : url
+        }
     }
-});
-
-return resp;
+}
