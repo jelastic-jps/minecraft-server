@@ -4,8 +4,8 @@
     "id": "sendEmail",
     "name": "Minecraft Server",
     "success": {
-      "text": "Your Minecraft server has been successfully deployed. </br> Please use the following server address to connect your Minecraft client: <a href='tcp://${this.url}'>${settings.url}</a>.",
-      "email": "Your Minecraft server has been successfully deployed. </br> Please use the following server address to connect your Minecraft client: <a href='tcp://${this.url}'>${settings.url}</a>."
+      "text": "Your Minecraft server has been successfully deployed. </br> Please use the following server address to connect your Minecraft client: <a href='tcp://${settings.url}'>${settings.url}</a>.",
+      "email": "Your Minecraft server has been successfully deployed. </br> Please use the following server address to connect your Minecraft client: <a href='tcp://${settings.url}'>${settings.url}</a>."
     }
   }
 }
