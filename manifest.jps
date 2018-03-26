@@ -1,86 +1,72 @@
 {
-  "jpsVersion": 0.8,
-  "jpsType": "install",
-  "application": {
-    "id": "minecraft-server",
-    "name": "Minecraft Server",
-    "description": "Minecraft server allows players to play online or via a local area network with other people.",
-    "logo": "https://github.com/jelastic-jps/minecraft-server/raw/master/images/minecraft-logo-90px.png",
-    "homepage": "https://github.com/jelastic-jps/minecraft-server",
-    "env": {
-      "topology": {
-        "nodes": [
-          {
-            "docker": {
-              "image": "itzg/minecraft-server",
-              "env": {
-                "EULA": "TRUE"
-              },
-              "entryPoint": "/start-server.sh"
-            },
-            "cloudlets": 16,
-            "nodeGroup": "cp",
-            "displayName": "Minecraft"
-          }
-        ]
+  "version": 0.99,
+  "type": "install",
+  "id": "minecraft-server",
+  "name": "Minecraft Server",
+  "description": "Minecraft server allows players to play online or via a local area network with other people.",
+  "logo": "https://github.com/jelastic-jps/minecraft-server/raw/master/images/minecraft-logo-90px.png",
+  "homepage": "https://github.com/jelastic-jps/minecraft-server",
+  "nodes": [
+    {
+      "docker": {
+        "image": "itzg/minecraft-server",
+        "env": {
+          "EULA": "TRUE"
+        },
+        "entryPoint": "/start-server.sh"
+      },
+      "cloudlets": 16,
+      "nodeGroup": "cp",
+      "displayName": "Minecraft"
+    }
+  ],
+  "license": {
+    "terms": {
+      "en": "I agree with <a href='https://account.mojang.com/documents/minecraft_eula' target='_blank'><u>terms of service</u></a>"
+    }
+  },
+  "onInstall": [
+    "updateConfiguration",
+    "addEndpoint",
+    {
+      "restartContainers": {
+        "nodeGroup": "cp"
+      }
+    }
+  ],
+  "actions": {
+    "sendEmail": {
+      "install": {
+        "jps": "https://raw.githubusercontent.com/jelastic-jps/minecraft-server/master/addons/sendEmail.jps",
+        "settings": {
+          "url": "${this.url}"
+        }
       }
     },
-    "license": {
-      "terms": {
-        "en": "I agree with <a href='https://account.mojang.com/documents/minecraft_eula' target='_blank'><u>terms of service</u></a>"
-      }
+    "updateConfiguration": {
+      "cmd [cp]": [
+        "echo \"eula=true\" > /data/eula.txt",
+        "sed  -i \"/usermod\\|groupmod/d\" /start",
+        "apk add screen",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/properties/server.properties -O /data/server.properties",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/lib/jelastic-gc-agent.jar -O /data/jelastic-gc-agent.jar",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/memoryConfig.sh -O /data/memoryConfig.sh",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/start-server.sh -O /start-server.sh",
+        "chmod +x /start-server.sh",
+        "mkdir -p /data/web/",
+        "chown -R minecraft:minecraft /data",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/web/index.html -O /data/web/index.html",
+        "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/start-web.sh -O /data/start-web.sh",
+        "bash /data/start-web.sh"
+      ],
+      "user": "minecraft"
     },
-    "onInstall": [
-      {
-        "call": [
-          "updateConfiguration",
-          "addEndpoint"
-        ]
-      },
-      {
-        "restartContainers": {
-          "nodeGroup": "cp"
-        }
+    "addEndpoint": {
+      "script": "https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/addEndpoint.js",
+      "params": {
+        "nodeId": "${nodes.cp.first.id}",
+        "port": 25565
       }
-    ],
-    "procedures": [
-      {
-        "id": "updateConfiguration",
-        "onCall": {
-          "executeShellCommands": {
-            "commands": [
-              "echo \"eula=true\" > /data/eula.txt",
-              "sed  -i \"/usermod\\|groupmod/d\" /start",
-              "apk add screen",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/properties/server.properties -O /data/server.properties",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/lib/jelastic-gc-agent.jar -O /data/jelastic-gc-agent.jar",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/memoryConfig.sh -O /data/memoryConfig.sh",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/start-server.sh -O /start-server.sh",
-              "chmod +x /start-server.sh",
-              "mkdir -p /data/web/",
-              "chown -R minecraft:minecraft /data",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/web/index.html -O /data/web/index.html",
-              "wget https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/start-web.sh -O /data/start-web.sh",
-              "bash /data/start-web.sh"
-            ],
-            "nodeGroup": "cp",
-            "user": "minecraft"
-          }
-        }
-      },
-      {
-        "id": "addEndpoint",
-        "onCall": {
-          "executeScript": {
-            "type": "js",
-            "script": "https://github.com/jelastic-jps/minecraft-server/raw/master/scripts/addEndpoint.js",
-            "params": {
-              "nodeId": "${nodes.cp.first.id}",
-              "port": 25565
-            }
-          }
-        }
-      }
-    ]
+    }
   }
 }
