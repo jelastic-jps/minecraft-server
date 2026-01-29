@@ -1,0 +1,58 @@
+type: install
+version: 0.99
+id: minecraft-server
+name: Minecraft Server
+description: Minecraft server allows players to play online or via a local area network with other people.
+homepage: https://github.com/jelastic-jps/minecraft-server
+
+logo: ${baseUrl}/images/minecraft-logo-90px.png
+
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/minecraft-server/master
+
+license:
+  terms: I agree with <a href='https://account.mojang.com/documents/minecraft_eula' target='_blank'><u>terms of service</u></a>
+
+nodes:
+  - image: itzg/minecraft-server:1.1.0
+    env:
+      EULA: "TRUE"
+    entryPoint: /start-server.sh
+    cloudlets: 16
+    nodeGroup: cp
+    displayName: Minecraft
+actions:
+  
+  sendEmail:
+    install:
+      jps: /addons/sendEmail.yml
+      settings:
+        url: ${this.url}
+  
+  updateConfiguration:
+    cmd [cp]: |-
+      echo "eula=true" > /data/eula.txt
+      sed  -i "/usermod\|groupmod/d" /start
+      apk add screen
+      wget ${baseUrl}/properties/server.properties -O /data/server.properties
+      wget ${baseUrl}/lib/jelastic-gc-agent.jar -O /data/jelastic-gc-agent.jar
+      wget ${baseUrl}/scripts/memoryConfig.sh -O /data/memoryConfig.sh
+      wget ${baseUrl}/scripts/start-server.sh -O /start-server.sh
+      chmod +x /start-server.sh
+      mkdir -p /data/web/
+      chown -R minecraft:minecraft /data
+      wget ${baseUrl}/web/index.html -O /data/web/index.html
+      wget ${baseUrl}/scripts/start-web.sh -O /data/start-web.sh
+      bash /data/start-web.sh
+    user: minecraft
+  
+  addEndpoint:
+    script: /scripts/addEndpoint.js
+    params:
+      nodeId: ${nodes.cp.first.id}
+      port: 25565
+
+onInstall:
+  - updateConfiguration
+  - addEndpoint
+  - restartContainers:
+      nodeGroup: cp
